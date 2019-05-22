@@ -1,10 +1,28 @@
-drop table consultant_clean;
+drop table CONsultant_clean;
 create table consultant_clean(
 consultant_skid number not null,
-consultant_id number not null,
-con_name varchar2(100),
-con_postcode varchar2(100),
-highest_qual number,
-con_registered date
+consultant_id number ,
+CONSULTANT_name varchar2(100),
+CONSULTANT_postcode varchar2(100),
+highest_qualification number,
+CONSULTANT_registered date,
+CONSULTANT_SKILL varchar2(100),
+PREFERRED_ROLE varchar2(100)
 );
-alter table consultant_clean add constraint pk1_consultant_skid primary key(consultant_skid)
+alter table CONsultant_clean add CONstraint pk1_CONsultant_skid primary key(CONsultant_skid);
+
+------------------------------------------------------------
+
+drop table CONsultant_error;
+create table CONsultant_error(
+CONsultant_skid number not null,
+CONsultant_id number,
+CONSULTANT_name varchar2(50),
+CONSULTANT_postcode varchar2(50),
+highest_qualification number,
+CONSULTANT_registered date,
+CONSULTANT_SKILL varchar2(100),
+PREFERRED_ROLE varchar2(100)
+);
+
+alter table CONsultant_error add CONstraint pk2_CONsultant_skid primary key(CONsultant_skid);

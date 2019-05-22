@@ -32,7 +32,7 @@ insert INTO STG_ACCOUNT
 select 
 		STAGING_ACCOUNT_SEQ.NEXTVAL,
 		account_id,
-    '',
+    NULL,
 		account_name,
 		account_postcode,
 		account_registered,
@@ -52,14 +52,14 @@ begin
 insert INTO STG_ACCOUNT 
 select
   STAGING_ACCOUNT_SEQ.NEXTVAL,
-  '',
+  NULL,
   COMPANY_ID,
   CMP_NAME,
   CMP_POSTCODE,
   DATE_REGISTERED,
-  '',
-  '',
-  ''
+  NULL,
+  NULL,
+  NULL
 from MCH_COMPANY;
 END PL_ACCOUNT_MCH;
 
