@@ -1,64 +1,113 @@
-drop table consultant_error;
-create table consultant_error(
-consultant_skid number not null,
-consultant_id number not null,
-con_name varchar2(50),
-con_postcode varchar2(50),
-highest_quality number,
-con_registered date
-);
+CREATE OR REPLACE PROCEDURE SPR_CLEAN_ERR_CONSULTANT
+AS
+CURSOR CUR IS
+SELECT * FROM STG_CONSULTANT;
 
-alter table consultant_error add constraint pk2_consultant_skid primary key(consultant_skid)
-----------------------------------------------------------
-drop sequence seq_consultant_error_skid
-create sequence seq_consultant_error_skid
-start with 1
-increment by 1;
+RES   STG_CONSULTANT%ROWTYPE;
 
-drop sequence seq_consultant_clean_skid
-create sequence seq_consultant_clean_skid
-start with 1
-increment by 1;
+BEGIN 
+OPEN CUR ;
+LOOP
+FETCH CUR INTO RES;
+EXIT WHEN CUR%NOTFOUND;
+CASE TRUE
+WHEN  REGEXP_LIKE(RES.CONSULTANT_NAME, '[*|_|#|&]')  
+THEN
+INSERT INTO CONSULTANT_ERROR 
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval,--CONSULTANT_SKID OF ERROR
+  RES.CONSULTANT_KEY,--CONSULTANT_ID OF ERROR
+  RES.CONSULTANT_NAME, 
+  RES.CONSULTANT_POSTCODE, 
+  RES.HIGHEST_QUALIFICATION,
+  RES.CONSULTANT_REGISTERED,
+  RES.CONSULTANT_SKILL,
+  RES.PREFERRED_ROLE
+  );
+  
+INSERT INTO CON_ISSUES
+  (
+  ISSUE_ID, 
+  ROW_ID, 
+  ISSUE, 
+  i_STATUS)
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval, 
+  RES.CONSULTANT_KEY, 
+  'SPECIAL CHARACTERS FOUND ON CONSULTANT', 
+  'UN-FIXED'
+  );
 
-create or replace procedure checkconsultant_quality 
-as
-begin
-insert into consultant_clean 
-	select 
-		seq_consultant_clean_skid.NEXTVAL,
-		consultant_id ,
-		cont_name,
-		cont_postcode,
-		highest_qualification,
-		cont_registered
-from st_consultant where 
-consultant_id is NOT NULL and 
-cont_name IS NOT NULL and 
-cont_postcode is NOT NULL and 
-REGEXP_LIKE (cont_postcode, '^LS|^YK') and
-NOT REGEXP_LIKE(cont_name,'[[:digit:]]');
+WHEN   RES.CONSULTANT_NAME IS NULL 
+THEN
+INSERT INTO CONSULTANT_ERROR 
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval,
+  RES.CONSULTANT_KEY,
+  RES.CONSULTANT_NAME, 
+  RES.CONSULTANT_POSTCODE, 
+  RES.HIGHEST_QUALIFICATION,
+  RES.CONSULTANT_REGISTERED,
+  RES.CONSULTANT_SKILL,
+  RES.PREFERRED_ROLE
+  );
+  
+INSERT INTO con_ISSUES
+  (
+  ISSUE_ID, 
+  ROW_ID, 
+  ISSUE, 
+  i_STATUS)
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval, 
+  RES.CONSULTANT_KEY, 
+  'FOUND VALUES EMPTY', 
+  'UN-FIXED'
+  );
+  WHEN   REGEXP_LIKE(RES.CONSULTANT_NAME,'[[:digit:]]') 
+THEN
+INSERT INTO CONSULTANT_ERROR 
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval,
+  RES.CONSULTANT_KEY,
+  RES.CONSULTANT_NAME, 
+  RES.CONSULTANT_POSTCODE, 
+  RES.HIGHEST_QUALIFICATION,
+  RES.CONSULTANT_REGISTERED,
+  RES.CONSULTANT_SKILL,
+  RES.PREFERRED_ROLE
+  );
+  
+INSERT INTO CON_ISSUES
+  (
+  ISSUE_ID, 
+  ROW_ID, 
+  ISSUE, 
+  i_STATUS)
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval, 
+  RES.CONSULTANT_KEY, 
+  'FOUND numeric VALUES', 
+  'UN-FIXED'
+  );
+ELSE INSERT INTO CONSULTANT_CLEAN 
+VALUES(
+  STAGING_CONSULTANT_SEQ.nextval,
+  RES.CONSULTANT_KEY,
+  RES.CONSULTANT_NAME, 
+  RES.CONSULTANT_POSTCODE, 
+  RES.HIGHEST_QUALIFICATION,
+  RES.CONSULTANT_REGISTERED,
+  RES.CONSULTANT_SKILL,
+  RES.PREFERRED_ROLE
+  );
 
-insert into consultant_error 
-	select 
-		seq_consultant_error_skid.NEXTVAL,
-		consultant_id ,
-		cont_name,
-		cont_postcode,
-		highest_qualification,
-		cont_registered
-from st_consultant where 
-consultant_id is NULL or 
-cont_name IS NULL or  
-cont_postcode is NULL or
-NOT REGEXP_LIKE (cont_postcode, '^LS|^YK') or
-REGEXP_LIKE(cont_name,'[[:digit:]]');
+END CASE;
+END LOOP;
+CLOSE CUR;
+END SPR_CLEAN_ERR_CONSULTANT;
 
-end;
-
-
-begin
- checkconsultant_quality;
-end;
-
-select * from consultant_clean ;
-select * from consultant_error ;
+--EXECUTING PROCEDURE-----------------------------------
+BEGIN 
+SPR_CLEAN_ERR_CONSULTANT;
+END;
