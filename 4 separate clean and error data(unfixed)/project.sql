@@ -1,53 +1,103 @@
-drop sequence seq_PROJECT_error_skid ;
-create sequence seq_PROJECT_error_skid start with 1 increment by 1;
+CREATE OR REPLACE PROCEDURE SPR_CLEAN_ERR_PROJECT
+AS
+CURSOR CUR IS
+SELECT * FROM STG_PROJECT;
 
-drop sequence seq_PROJECT_clean_skid 
-create sequence seq_PROJECT_clean_skid start with 1 increment by 1;
----------------------------------------------------------------------------------
-create or replace procedure checkproject_dataquality
-as
-begin
-insert into project_clean 
-	select 
-		seq_PROJECT_clean_skid.NEXTVAL,
-		PROJECT_id,
-		plct_short_desc,
-		plct_required_start_date,
-		plct_estimated_end_date,
-		plct_actual_start_date,
-		plct_actual_end_date,
-		plct_renewal_number,
-		plct_rate_day_proj,
-		actual_salary,
-		account_id,
-		consultant_id
-from staging_project where
-plct_short_desc is NOT NULL and
-NOT REGEXP_LIKE(plct_short_desc,'[[:digit:]]');
+RES   STG_PROJECT%ROWTYPE;
 
-insert into project_error 
-	select 
-		seq_PROJECT_error_skid.NEXTVAL,
-		PROJECT_id,
-		plct_short_desc,
-		plct_required_start_date,
-		plct_estimated_end_date,
-		plct_actual_start_date,
-		plct_actual_end_date,
-		plct_renewal_number,
-		plct_rate_day_proj,
-		actual_salary,
-		account_id,
-		consultant_id
-from staging_project where
-plct_short_desc is NULL or
-REGEXP_LIKE(plct_short_desc,'[[:digit:]]');
+BEGIN 
+OPEN CUR ;
+LOOP
+FETCH CUR INTO RES;
+EXIT WHEN CUR%NOTFOUND;
 
-end;
+IF  REGEXP_LIKE(RES.plct_short_desc,'[*|_|#|$]' )  
+THEN
+INSERT INTO PROJECT_ERROR 
+VALUES(
+  STAGING_PROJECT_SEQ.nextval,--ACCOUNT_SKID OF ERROR
+  RES.PROJECT_KEY,--ACCOUNT_ID OF ERROR
+  RES.PLCT_SHORT_DESC, 
+  RES.PLCT_REQUIRED_START_DATE , 
+	RES.PLCT_ESTIMATED_END_DATE , 
+	RES.PLCT_ACTUAL_START_DATE , 
+	RES.PLCT_ACTUAL_END_DATE , 
+	RES.PLCT_RENEWAL_NUMBER , 
+	RES.PLCT_RATE_DAY_PROJ , 
+	
+	RES.ACTUAL_SALARY 
+	
+  );
+  
+INSERT INTO PRO_ISSUES
+  (
+  ISSUE_ID, 
+  ROW_ID, 
+  ISSUE, 
+  i_STATUS)
+VALUES(
+  STAGING_PROJECT_SEQ.nextval, 
+  RES.PROJECT_KEY, 
+  'GARBAGE CHARACTERS FOUND ', 
+  'UN-FIXED'
+  );
 
-begin
-checkproject_dataquality;
-end;
+ELSIF   RES.plct_short_desc IS NULL 
+THEN
+INSERT INTO PROJECT_ERROR 
+VALUES(
+   STAGING_PROJECT_SEQ.nextval,--ACCOUNT_SKID OF ERROR
+  RES.PROJECT_KEY,--ACCOUNT_ID OF ERROR
+  RES.PLCT_SHORT_DESC, 
+ RES.PLCT_REQUIRED_START_DATE , 
+	RES.PLCT_ESTIMATED_END_DATE , 
+	RES.PLCT_ACTUAL_START_DATE , 
+	RES.PLCT_ACTUAL_END_DATE , 
+	RES.PLCT_RENEWAL_NUMBER , 
+	RES.PLCT_RATE_DAY_PROJ , 
+	
+	RES.ACTUAL_SALARY  
+	
+  );
+  
+INSERT INTO PRO_ISSUES
+  (
+  ISSUE_ID, 
+  ROW_ID, 
+  ISSUE, 
+  i_STATUS)
+VALUES(
+  STAGING_PROJECT_SEQ.nextval, 
+  RES.PROJECT_KEY, 
+  'FOUND VALUES EMPTY', 
+  'UN-FIXED'
+  );
+  
+ELSE
 
-select * from project_clean;
-select * from project_error;
+INSERT INTO PROJECT_CLEAN 
+VALUES(
+    STAGING_PROJECT_SEQ.nextval,--ACCOUNT_SKID OF ERROR
+  RES.PROJECT_KEY,--ACCOUNT_ID OF ERROR
+   
+  RES.PLCT_SHORT_DESC, 
+ RES.PLCT_REQUIRED_START_DATE , 
+	RES.PLCT_ESTIMATED_END_DATE , 
+	RES.PLCT_ACTUAL_START_DATE , 
+	RES.PLCT_ACTUAL_END_DATE , 
+	RES.PLCT_RENEWAL_NUMBER , 
+	RES.PLCT_RATE_DAY_PROJ , 
+	
+	RES.ACTUAL_SALARY 
+	
+  );
+
+END IF;
+END LOOP;
+CLOSE CUR;
+END SPR_CLEAN_ERR_PROJECT;
+
+--EXECUTING PROCEDURE-----------------------------------
+BEGIN 
+SPR_CLEAN_ERR_PROJECT;
+END

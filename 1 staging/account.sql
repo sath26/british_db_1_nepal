@@ -22,7 +22,7 @@ CREATE TABLE  "STG_ACCOUNT"
 CREATE OR REPLACE TRIGGER  "STAGING_ACCOUNT_TRIGGER" before insert on STG_Account
 for each row
 begin
-:new.account_key :=staging_account_seq.NEXTVAL;
+:new.account_key :=staging_account_seq.NEXTVAL;--SURROGATE KEY COLUMN NAME
 end;
 -----------------------------------------------------------------------------------------
 create or replace procedure PL_ACCOUNT_LDS
