@@ -17,6 +17,7 @@ account_id_lds_fk
 account_id_mch_fk(company)
 consultant_id_lds_fk
 consultant_id_mch_fk
+```
 
 # FOR CREATING COLUMN NAME AND RUN INSERT QUERY LATER ON
 dont use small letter 
