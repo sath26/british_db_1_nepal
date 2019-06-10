@@ -18,4 +18,7 @@ account_id_mch_fk(company)
 consultant_id_lds_fk
 consultant_id_mch_fk
 
-
+# FOR CREATING COLUMN NAME AND RUN INSERT QUERY LATER ON
+dont use small letter 
+use capital letter with double quotation only
+small letter cause bug i.e. column not allowed here.
