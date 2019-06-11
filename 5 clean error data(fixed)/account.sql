@@ -15,8 +15,9 @@ WHEN RES.REGISTERED_DATE IS NULL
 THEN
   INSERT INTO ACCOUNT_CLEAN 
     VALUES(
-      STAGING_ACCOUNT_SEQ.nextval,--ACCOUNT_SKID OF CLEAN
-      RES.ACCOUNT_ID,--ACCOUNT_ID OF CLEAN
+      RES.account_skid,--ACCOUNT_SKID OF CLEAN
+      RES.ACCOUNT_id_lds,
+      RES.ACCOUNT_id_mch,--ACCOUNT_ID OF CLEAN
       RES.ACCOUNT_NAME,
       RES.ACCOUNT_POSTCODE,
       TO_DATE(TRUNC
@@ -32,7 +33,7 @@ THEN
       RES.NO_OF_EMPLOYEES,
       RES.GLOBAL_INFLUENCE
       );
-  UPDATE ACC_ISSUES SET I_STATUS ='FIXED' WHERE ROW_ID= RES.ACCOUNT_ID  ;--NEED ACCOUNT_ID OF ERROR
+  UPDATE ACC_ISSUES SET I_STATUS ='FIXED' WHERE ROW_ID= RES.ACCOUNT_SKID ;--NEED surrogate key of error talbe
 
 WHEN REGEXP_LIKE(RES.ACCOUNT_NAME,'[*|_|#|&]' )
 THEN
@@ -41,8 +42,9 @@ THEN
   
 INSERT INTO ACCOUNT_CLEAN 
     VALUES(
-      STAGING_ACCOUNT_SEQ.nextval,
-      RES.ACCOUNT_ID,--
+      RES.account_skid,
+      RES.ACCOUNT_id_lds,
+      RES.ACCOUNT_id_mch,
       TRIM(TEMP_VAL),
       RES.ACCOUNT_POSTCODE,
       RES.REGISTERED_DATE,
@@ -50,7 +52,7 @@ INSERT INTO ACCOUNT_CLEAN
       RES.NO_OF_EMPLOYEES,
       RES.GLOBAL_INFLUENCE
       );
-  UPDATE ACC_ISSUES SET I_STATUS ='FIXED' WHERE ROW_ID= RES.ACCOUNT_ID ;
+  UPDATE ACC_ISSUES SET I_STATUS ='FIXED' WHERE ROW_ID= RES.ACCOUNT_SKID;
   END CASE;
 END LOOP;
 CLOSE CUR;
@@ -67,4 +69,5 @@ END;
 --100% data migration is needed
 -- update issue table that its fixed
 -- THERE ARE VALUES THAT ARE EMPTY
+--only gave data to registered because i might need it for report
 ------------------------------------------------------------------------------------------------------

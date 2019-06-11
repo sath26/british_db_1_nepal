@@ -5,7 +5,8 @@ drop table account_clean
 CREATE TABLE account_clean 
 (   
 account_skid number not null,
-account_id number not null,
+account_id_lds number ,
+account_id_mch number ,
 account_name varchar2(50),
 account_postcode varchar2(25),
 registered_date date,
@@ -20,7 +21,8 @@ drop table account_error
 CREATE TABLE account_error 
 (   
 account_skid number not null,
-account_id number not null,
+account_id_lds number ,
+account_id_mch number ,
 account_name varchar2(50),
 account_postcode varchar2(25),
 registered_date date,

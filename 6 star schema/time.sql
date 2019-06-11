@@ -1,9 +1,7 @@
 --------------------------------------------------------------------------------------------------------
-create table dim_time(
-time_id NUMBER not null,
-year NUMBER,
-month NUMBER,
-day NUMBER
+create table DIM_TIME(
+TIME_ID NUMBER not null,
+YEAR_C NUMBER
 );
 alter table dim_time add  
 constraint pk_dim_time_id 
@@ -16,36 +14,33 @@ create sequence seq_time_id
 start with 1
 increment by 1;
 -------------------------------------------------------
+  CREATE OR REPLACE TRIGGER trigger_sdtime
+BEFORE INSERT ON dim_time
+FOR EACH ROW
+BEGIN
+   :new.time_id := seq_time_id.NEXTVAL;
+END;
+-------------------------------------------------------
 create or replace procedure check_time 
-as
- v_count number;
+AS
+CURSOR CUR IS
+select distinct 
+  to_char(PLT_ACTUAL_START_DATE,'yyyy') AS YEARS
+  FROM PROJECT_CLEAN ; 
+RES   CUR%ROWTYPE;
+   --USED CURSOR NAME HERE UNLIKE TABLE NAME 
 begin
- for result in (
-  select distinct 
-  to_char(PLT_ACTUAL_START_DATE,'yyyy') as years,
-  to_char(PLT_ACTUAL_START_DATE,'mm') as months 
-  from project_clean)
-   loop
-       select count(*) into v_count 
-       from dim_time 
-       where year=result.years and month=result.months;
-       if v_count=0 then
-        insert into dim_time(
-            time_id,
-            year,
-            month) 
-        values (seq_time_id.NEXTVAL,
-        result.years,
-        result.months);
-        
-        dbms_output.put_line('date inserted successfully');
-      
-       else
-        dbms_output.put_line('date already inserted');
-       end if;
-   
-   end loop;
-
+OPEN CUR ;
+LOOP
+FETCH CUR INTO RES;
+EXIT WHEN CUR%NOTFOUND;
+ insert into DIM_TIME
+  VALUES(
+    seq_time_id.NEXTVAL,
+    RES.YEARS
+  )  ;
+END LOOP;
+CLOSE CUR;
 end;
 
 begin

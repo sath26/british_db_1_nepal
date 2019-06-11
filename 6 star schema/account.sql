@@ -1,9 +1,10 @@
---
+--surrogate key is not needed in dim tables
 
 CREATE TABLE dim_account
 (   
 account_skid number not null,
-account_id number not null,
+ACCOUNT_ID_LDS NUMBER UNIQUE, 
+ACCOUNT_ID_MCH NUMBER UNIQUE, 
 account_name varchar2(50),
 account_postcode varchar2(25),
 registered_date date,
@@ -32,7 +33,8 @@ begin
 insert into dim_account 
   select 
   seq_dim_account_skid.NEXTVAL,
-  account_id,
+  ACCOUNT_ID_LDS, 
+	ACCOUNT_ID_MCH, 
   account_name,
   account_postcode,
   registered_date,
