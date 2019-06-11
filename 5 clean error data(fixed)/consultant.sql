@@ -15,8 +15,9 @@ BEGIN
         CASE TRUE 
           WHEN res.consultant_name IS NULL THEN 
             INSERT INTO consultant_clean 
-            VALUES     ( staging_consultant_seq.NEXTVAL, 
-                        res.consultant_id,
+            VALUES     ( res.consultant_skid, 
+                        res.consultant_id_lds,
+                        res.consultant_id_mch,
                         'saugat thapa', 
                         res.consultant_postcode, 
                         res.highest_qualification, 
@@ -26,15 +27,16 @@ BEGIN
 
             UPDATE con_issues 
             SET    i_status = 'FIXED' 
-            WHERE  row_id = res.consultant_id;  
+            WHERE  row_id = res.consultant_skid;  
           
             WHEN Regexp_like(res.consultant_name, '[*|_|#|&]') THEN 
               SELECT TRANSLATE(res.consultant_name, '#&*_', ' ') 
               INTO   temp_val 
               FROM   dual; 
               INSERT INTO consultant_clean 
-              VALUES     ( staging_consultant_seq.NEXTVAL, 
-                          res.consultant_id, 
+              VALUES     ( res.consultant_skid, 
+                          res.consultant_id_lds, 
+                          res.consultant_id_mch, 
                           Trim(temp_val), 
                           res.consultant_postcode, 
                           res.highest_qualification, 
@@ -44,14 +46,15 @@ BEGIN
 
               UPDATE con_issues 
               SET    i_status = 'FIXED' 
-              WHERE  row_id = res.consultant_id; 
+              WHERE  row_id = res.consultant_skid; 
             WHEN Regexp_like(res.consultant_name, '[[:digit:]]') THEN 
               SELECT TRANSLATE(res.consultant_name, '123456789', ' ') 
               INTO   temp_val 
               FROM   dual; 
               INSERT INTO consultant_clean 
-              VALUES( staging_consultant_seq.NEXTVAL, 
-                          res.consultant_id, 
+              VALUES( res.consultant_skid, 
+                          res.consultant_id_lds, 
+                          res.consultant_id_mch, 
                           Trim(temp_val), 
                           res.consultant_postcode, 
                           res.highest_qualification, 
@@ -60,7 +63,7 @@ BEGIN
                           res.preferred_role ); 
               UPDATE con_issues 
               SET    i_status = 'FIXED' 
-              WHERE  row_id = res.consultant_id; 
+              WHERE  row_id = res.consultant_skid; 
         END CASE; 
     END LOOP; 
     CLOSE cur; 

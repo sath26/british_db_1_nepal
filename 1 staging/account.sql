@@ -1,5 +1,6 @@
 CREATE TABLE  "STG_ACCOUNT" 
-   (	"ACCOUNT_KEY" NUMBER NOT NULL ENABLE, 
+   (
+	"ACCOUNT_KEY" NUMBER NOT NULL ENABLE, 
 	"ACCOUNT_ID_LDS" NUMBER, 
 	"ACCOUNT_ID_MCH" NUMBER, 
 	"ACCOUNT_NAME" VARCHAR2(200), 
@@ -32,7 +33,7 @@ insert INTO STG_ACCOUNT
 select 
 		STAGING_ACCOUNT_SEQ.NEXTVAL,
 		account_id,
-    NULL,
+    	NULL,
 		account_name,
 		account_postcode,
 		account_registered,

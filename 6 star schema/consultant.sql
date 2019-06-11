@@ -4,11 +4,14 @@ drop table dim_consultant
 
 create table dim_consultant(
 consultant_skid number not null,
-consultant_id number not null,
-con_name varchar2(100),
-con_postcode varchar2(100),
-highest_qual number,
-con_registered date
+consultant_id_lds number unique,
+consultant_id_mch number unique,
+CONSULTANT_NAME varchar2(100),
+CONSULTANT_POSTCODE varchar2(100),
+HIGHEST_QUALIFICATION number,
+CONSULTANT_REGISTERED date,
+CONSULTANT_SKILL varchar2(100),
+  PREFERRED_ROLE varchar2(100)
 );
 alter table dim_consultant add constraint pk3_consultant_skid primary key(consultant_skid)
 -------------------------------------------------------------------
@@ -28,32 +31,19 @@ END
 ------------------------------------------------
 create or replace procedure  datadim_consultant 
 as 
-begin
-MERGE INTO dim_consultant dc
-    USING consultant_clean cc
-    ON (
-      cc.consultant_id =dc.consultant_id and
-        cc.con_postcode=dc.con_postcode
-)
-    WHEN MATCHED THEN 
-   update SET dc.con_name=cc.con_name,
-           dc.highest_qual=cc.highest_qual,
-           dc.con_registered=cc.con_registered
-           
-WHEN NOT MATCHED THEN 
-INSERT (dc.consultant_id,
-  dc.con_name,
-  dc.con_postcode,
-  dc.highest_qual,
-  dc.con_registered)
-    VALUES (
-      cc.consultant_id,
-      cc.con_name,
-      cc.con_postcode,
-      cc.highest_qual,
-      cc.con_registered);
-
-dbms_output.put_line('clean data loaded into dimension table of placement');
+begin 
+insert into dim_consultant 
+  select 
+  seq_dim_account_skid.NEXTVAL,
+ CONSULTANT_ID_LDS, 
+	CONSULTANT_ID_MCH, 
+  CONSULTANT_NAME,
+  CONSULTANT_POSTCODE,
+  HIGHEST_QUALIFICATION,
+  CONSULTANT_REGISTERED,
+  CONSULTANT_SKILL,
+  PREFERRED_ROLE
+from consultant_clean;
 end;
 
 
