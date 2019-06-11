@@ -22,3 +22,6 @@ consultant_id_mch_fk
 dont use small letter 
 use capital letter with double quotation only
 small letter cause bug i.e. column not allowed here.
+
+# cursor name used instead of table name for rowtype
+see in ```dim_table.sql```
