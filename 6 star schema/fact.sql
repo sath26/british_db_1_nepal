@@ -135,102 +135,101 @@ fill_fact_data;
 
 end;
 ---------------------*************************------------------------------
-create or replace FUNCTION get_consultant_id_LDS(
-  consultant_id_lds IN NUMBER,
-  years IN VARCHAR2
+CREATE OR REPLACE FUNCTION GET_CONSULTANT_ID_LDS(
+  CONSULTANT_ID_LDS_P IN NUMBER,
+  YEARS IN VARCHAR2
 ) 
-   RETURN VARCHAR2
-   IS no_consult_LDS VARCHAR2(130);
+   RETURN NUMBER
+   IS NO_CONSULT_LDS NUMBER;
 
    BEGIN 
 
-	  select count(consultant_id_LDS) 
-    into no_consult_LDS
-    from project_clean
-    where consultant_id_lds = consultant_id_lds
-    and to_char(PLT_ACTUAL_START_DATE,'yyyy')=years;
+	  SELECT COUNT(CONSULTANT_ID_LDS) 
+    INTO NO_CONSULT_LDS
+    FROM PROJECT_CLEAN
+    WHERE CONSULTANT_ID_LDS = CONSULTANT_ID_LDS_P
+    AND TO_CHAR(PLT_ACTUAL_START_DATE,'YYYY')=YEARS;
 
-      RETURN(no_consult_LDS); 
+      RETURN(NO_CONSULT_LDS); 
 
-    END get_consultant_id_LDS;
+    END GET_CONSULTANT_ID_LDS;
 
     SET SERVEROUTPUT ON;
-EXECUTE dbms_output.put_line(get_consultant_id_LDS(10,'2012'));
+EXECUTE DBMS_OUTPUT.PUT_LINE(GET_CONSULTANT_ID_LDS(10,'2012'));
 ---------------------*************************------------------------------
 
-create or replace FUNCTION get_consultant_id_MCH(
-  consultant_id_mch IN NUMBER,
-  years IN VARCHAR2
-) 
-   RETURN VARCHAR2
-   IS no_consult_MCH VARCHAR2(130);
+CREATE OR REPLACE FUNCTION GET_CONSULTANT_ID_MCH(
+  CONSULTANT_ID_MCH_P IN NUMBER,
+  YEARS IN VARCHAR2) 
+   RETURN NUMBER
+   IS NO_CONSULT_MCH NUMBER;
 
    BEGIN 
 
-	 select count(consultant_id_MCH) into no_consult_MCH
-      from project_clean
-      where consultant_id_mch = consultant_id_mch
-      and to_char(PLT_ACTUAL_START_DATE,'yyyy')=years;
+	 SELECT COUNT(CONSULTANT_ID_MCH) INTO NO_CONSULT_MCH
+      FROM PROJECT_CLEAN
+      WHERE CONSULTANT_ID_MCH = CONSULTANT_ID_MCH_P
+      AND TO_CHAR(PLT_ACTUAL_START_DATE,'YYYY')=YEARS;
 
-      RETURN(no_consult_MCH); 
+      RETURN(NO_CONSULT_MCH); 
 
-    END get_consultant_id_MCH;
+    END GET_CONSULTANT_ID_MCH;
 SET SERVEROUTPUT ON;
-EXECUTE dbms_output.put_line(get_consultant_id_MCH(31,'2012'));
+EXECUTE DBMS_OUTPUT.PUT_LINE(GET_CONSULTANT_ID_MCH(31,'2012'));
 ---------------------*************************------------------------------
-create or replace FUNCTION get_account_id_LDS(
-  account_id_LDS IN NUMBER,
- years IN VARCHAR2
+CREATE OR REPLACE FUNCTION GET_ACCOUNT_ID_LDS(
+  ACCOUNT_ID_LDS_P IN NUMBER,
+ YEARS IN VARCHAR2
 ) 
-   RETURN VARCHAR2
-   IS no_account_lds VARCHAR2(130);
+   RETURN NUMBER
+   IS NO_ACCOUNT_LDS NUMBER;
 
    BEGIN 
 
-	 select count(account_id_LDS)  into no_account_lds
-      from project_clean
-      where account_id_lds = account_id_LDS
-      and to_char(PLT_ACTUAL_START_DATE,'yyyy')=years;
+	 SELECT COUNT(ACCOUNT_ID_LDS)  INTO NO_ACCOUNT_LDS
+      FROM PROJECT_CLEAN
+      WHERE ACCOUNT_ID_LDS = ACCOUNT_ID_LDS_P
+      AND TO_CHAR(PLT_ACTUAL_START_DATE,'YYYY')=YEARS;
 
-      RETURN(no_account_lds); 
+      RETURN(NO_ACCOUNT_LDS); 
 
-    END get_account_id_LDS;
+    END GET_ACCOUNT_ID_LDS;
 SET SERVEROUTPUT ON;
-EXECUTE dbms_output.put_line(get_account_id_LDS(41,'2012'));
+EXECUTE DBMS_OUTPUT.PUT_LINE(GET_ACCOUNT_ID_LDS(41,'2012'));
 ---------------------*************************------------------------------
-create or replace FUNCTION get_account_id_MCH(
-  account_id_mch IN NUMBER,
- years IN VARCHAR2
+CREATE OR REPLACE FUNCTION GET_ACCOUNT_ID_MCH(
+  ACCOUNT_ID_MCH_P IN NUMBER,
+ YEARS IN VARCHAR2
 )  
-   RETURN VARCHAR2
-   IS no_account_mch VARCHAR2(130);
+   RETURN NUMBER
+   IS NO_ACCOUNT_MCH NUMBER;
 
    BEGIN 
 
-	select count(account_id_MCH)  into no_account_mch
-      from project_clean
-      where account_id_mch = account_id_mch
-      and to_char(PLT_ACTUAL_START_DATE,'yyyy')=years;
+	SELECT COUNT(ACCOUNT_ID_MCH)  INTO NO_ACCOUNT_MCH
+      FROM PROJECT_CLEAN
+      WHERE ACCOUNT_ID_MCH = ACCOUNT_ID_MCH_P
+      AND TO_CHAR(PLT_ACTUAL_START_DATE,'YYYY')=YEARS;
       
-      RETURN(no_account_mch); 
+      RETURN(NO_ACCOUNT_MCH); 
 
-    END get_account_id_MCH;
+    END GET_ACCOUNT_ID_MCH;
 SET SERVEROUTPUT ON;
-EXECUTE dbms_output.put_line(get_account_id_MCH(20));
+EXECUTE DBMS_OUTPUT.PUT_LINE(GET_ACCOUNT_ID_MCH(20));
 
 ---------------------*************************------------------------------
-create or replace FUNCTION get_time_id(years IN VARCHAR2) 
-   RETURN VARCHAR2
-   IS time_id VARCHAR2(130);
+CREATE OR REPLACE FUNCTION GET_TIME_ID(YEARS IN VARCHAR2) 
+   RETURN NUMBER
+   IS TIME_ID NUMBER;
 
    BEGIN 
 
-	  select time_id into time_id
-      from dim_time
-      where year_c = years;
+	  SELECT TIME_ID INTO TIME_ID
+      FROM DIM_TIME
+      WHERE YEAR_C = YEARS;
 
-      RETURN(time_id); 
+      RETURN(TIME_ID); 
 
-    END get_time_id;
+    END GET_TIME_ID;
 SET SERVEROUTPUT ON;
-EXECUTE dbms_output.put_line(get_years(20));
+EXECUTE DBMS_OUTPUT.PUT_LINE(GET_YEARS(20));
